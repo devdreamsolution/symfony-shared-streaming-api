@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MessageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,6 +25,16 @@ class Message
      */
     private $sender;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="received_messages")
+     */
+    private $receiver;
+
+    public function __construct()
+    {
+        $this->receiver = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,6 +48,32 @@ class Message
     public function setSender(?User $sender): self
     {
         $this->sender = $sender;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getReceiver(): Collection
+    {
+        return $this->receiver;
+    }
+
+    public function addReceiver(User $receiver): self
+    {
+        if (!$this->receiver->contains($receiver)) {
+            $this->receiver[] = $receiver;
+        }
+
+        return $this;
+    }
+
+    public function removeReceiver(User $receiver): self
+    {
+        if ($this->receiver->contains($receiver)) {
+            $this->receiver->removeElement($receiver);
+        }
 
         return $this;
     }

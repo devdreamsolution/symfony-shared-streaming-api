@@ -29,9 +29,15 @@ class User
      */
     private $sent_messages;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Message::class, mappedBy="receiver")
+     */
+    private $received_messages;
+
     public function __construct()
     {
         $this->sent_messages = new ArrayCollection();
+        $this->received_messages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -77,6 +83,34 @@ class User
             if ($sentMessage->getSender() === $this) {
                 $sentMessage->setSender(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Message[]
+     */
+    public function getReceivedMessages(): Collection
+    {
+        return $this->received_messages;
+    }
+
+    public function addReceivedMessage(Message $receivedMessage): self
+    {
+        if (!$this->received_messages->contains($receivedMessage)) {
+            $this->received_messages[] = $receivedMessage;
+            $receivedMessage->addReceiver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReceivedMessage(Message $receivedMessage): self
+    {
+        if ($this->received_messages->contains($receivedMessage)) {
+            $this->received_messages->removeElement($receivedMessage);
+            $receivedMessage->removeReceiver($this);
         }
 
         return $this;
