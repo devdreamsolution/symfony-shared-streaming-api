@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20200519110215 extends AbstractMigration
+final class Version20200519145312 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -22,9 +22,7 @@ final class Version20200519110215 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('CREATE TABLE message_user (message_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_24064D90537A1329 (message_id), INDEX IDX_24064D90A76ED395 (user_id), PRIMARY KEY(message_id, user_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE message_user ADD CONSTRAINT FK_24064D90537A1329 FOREIGN KEY (message_id) REFERENCES message (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE message_user ADD CONSTRAINT FK_24064D90A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE user ADD email VARCHAR(255) NOT NULL, ADD password VARCHAR(255) NOT NULL, ADD name VARCHAR(255) NOT NULL, ADD surename VARCHAR(255) NOT NULL, ADD picture VARCHAR(255) DEFAULT NULL, ADD age SMALLINT DEFAULT NULL, ADD vat DOUBLE PRECISION DEFAULT NULL, ADD address VARCHAR(255) DEFAULT NULL, ADD city_residence VARCHAR(255) DEFAULT NULL, ADD group_age SMALLINT DEFAULT NULL, ADD gender SMALLINT DEFAULT NULL, ADD lang VARCHAR(255) NOT NULL, ADD created_at DATETIME NOT NULL, ADD updated_at DATETIME NOT NULL');
     }
 
     public function down(Schema $schema) : void
@@ -32,6 +30,6 @@ final class Version20200519110215 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('DROP TABLE message_user');
+        $this->addSql('ALTER TABLE user DROP email, DROP password, DROP name, DROP surename, DROP picture, DROP age, DROP vat, DROP address, DROP city_residence, DROP group_age, DROP gender, DROP lang, DROP created_at, DROP updated_at');
     }
 }
