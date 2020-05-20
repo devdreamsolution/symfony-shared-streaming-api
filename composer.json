@@ -1,4 +1,6 @@
 {
+    "name": "xiao/shared audio",
+    "description": "Shared audio project back-end",
     "type": "project",
     "require": {
         "php": "^7.1.3",
