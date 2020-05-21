@@ -1,6 +1,6 @@
 register:
     path: /register
-    controller: App\Controller\DefaultController::register
+    controller: App\Controller\UserController::register
     methods: POST
 
 api:
