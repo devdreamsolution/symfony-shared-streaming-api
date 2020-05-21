@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Table(name="user")
@@ -23,11 +24,15 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
+     * @Assert\NotBlank()
+     * @Assert\Unique()
+     * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=500)
+     * @Assert\NotBlank()
      */
     private $password;
 
@@ -43,11 +48,15 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * Assert\Length(["max" => 100])
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * Assert\Length(["max" => 100])
      */
     private $surename;
 
@@ -58,31 +67,37 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Assert\Positive()
      */
     private $age;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Assert\Positive()
      */
     private $vat;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * Assert\Length(["max" => 200])
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * Assert\Length(["max" => 200])
      */
     private $city_residence;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Assert\Positive()
      */
     private $group_age;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)
+     * @Assert\PositiveOrZero()
      * $gender == 1 : male, $gender == 2 : fermale
      */
     private $gender;
