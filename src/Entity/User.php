@@ -8,10 +8,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Table(name="user")
  * @ORM\Entity
+ * @UniqueEntity(fields={"email"}, message="I think you're already registered!")
  */
 class User implements UserInterface
 {
@@ -25,7 +27,6 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=25, unique=true)
      * @Assert\NotBlank()
-     * @Assert\Unique()
      * @Assert\Email()
      */
     private $email;
@@ -203,14 +204,15 @@ class User implements UserInterface
     }
 
     /**
-     * @see UserInterface
+     * Returns the roles or permissions granted to the user for security.
      */
-    public function getRoles(): string
+    public function getRoles(): array
     {
-        $roles = $this->roles;
+        $roles[] = $this->roles;
 
-        return $roles;
+        return array_unique($roles);
     }
+
 
     public function setRoles(string $roles): self
     {

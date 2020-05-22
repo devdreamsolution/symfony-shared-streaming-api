@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
@@ -27,18 +28,18 @@ class UserController extends AbstractController
 	{
 		$em = $this->getDoctrine()->getManager();
 
-		$email = $request->request->get('_email');
-		$password = $request->request->get('_password');
-		$name = $request->request->get('_name');
-		$surename = $request->request->get('_surename');
-		$roles = $request->request->get('_roles');
+		$email = $request->request->get('username');
+		$password = $request->request->get('password');
+		$name = $request->request->get('name');
+		$surename = $request->request->get('surename');
+		$roles = $request->request->get('roles');
 
 		$user = new User();
 		if ($roles == 0)							// tuorist
 		{
-			$city_residence = $request->request->get('_city_residence');
-			$group_age = $request->request->get('_group_age');
-			$gender = $request->request->get('_gender');
+			$city_residence = $request->request->get('city_residence');
+			$group_age = $request->request->get('group_age');
+			$gender = $request->request->get('gender');
 
 			$user->setCityResidence($city_residence);
 			$user->setGroupAge($group_age);
@@ -47,9 +48,9 @@ class UserController extends AbstractController
 		}
 		else if ($roles == 1)						// guide
 		{
-			$age = $request->request->get('_age');
-			$vat = $request->request->get('_vat');
-			$address = $request->request->get('_address');
+			$age = $request->request->get('age');
+			$vat = $request->request->get('vat');
+			$address = $request->request->get('address');
 
 			$user->setRoles('ROLE_GUIDE');
 			$user->setPicture('');                  // file upload
@@ -65,14 +66,13 @@ class UserController extends AbstractController
 
 		$errors = $validator->validate($user);
 		if (count($errors) > 0) {
-			/*
-			* Uses a __toString method on the $errors variable which is a
-			* ConstraintViolationList object. This gives us a nice string
-			* for debugging.
-			*/
-			$errorsString = (string) $errors[0];
-
-			return new Response($errorsString);
+			$errorArray = [];
+			foreach($errors as $error)
+			{
+				$key = $error->getPropertyPath();
+				$errorArray[$key] = $error->getMessage();
+			}
+			return new JsonResponse($errorArray);
 		}
 
 		$em->persist($user);
