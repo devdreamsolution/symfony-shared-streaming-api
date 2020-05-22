@@ -14,18 +14,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
-    /**
-     * @Route("/user", name="user")
-     */
-	public function index()
+	public function userRegister(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
 	{
-		return $this->render('user/index.html.twig', [
-			'controller_name' => 'UserController',
-		]);
-	}
-
-	public function register(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
-	{
+		$responseArray = [];
 		$em = $this->getDoctrine()->getManager();
 
 		$email = $request->request->get('username');
@@ -35,7 +26,7 @@ class UserController extends AbstractController
 		$roles = $request->request->get('roles');
 
 		$user = new User();
-		if ($roles == 0)							// tuorist
+		if ($roles == 0)								// ROLE_TOURIST
 		{
 			$city_residence = $request->request->get('city_residence');
 			$group_age = $request->request->get('group_age');
@@ -44,16 +35,16 @@ class UserController extends AbstractController
 			$user->setCityResidence($city_residence);
 			$user->setGroupAge($group_age);
 			$user->setGender($gender);
-			$user->setRoles('ROLE_TUORIST');
+			$user->setRoles('ROLE_TOURIST');
 		}
-		else if ($roles == 1)						// guide
+		else if ($roles == 1)						// ROLE_GUIDE
 		{
 			$age = $request->request->get('age');
 			$vat = $request->request->get('vat');
 			$address = $request->request->get('address');
 
 			$user->setRoles('ROLE_GUIDE');
-			$user->setPicture('');                  // file upload
+			$user->setPicture('');              // file upload
 			$user->setAge($age);
 			$user->setVat($vat);
 			$user->setAddress($address);
@@ -66,18 +57,20 @@ class UserController extends AbstractController
 
 		$errors = $validator->validate($user);
 		if (count($errors) > 0) {
-			$errorArray = [];
 			foreach($errors as $error)
 			{
 				$key = $error->getPropertyPath();
-				$errorArray[$key] = $error->getMessage();
+				$responseArray['code'] = $error->getCode();
+				$responseArray[$key] = $error->getMessage();
 			}
-			return new JsonResponse($errorArray);
+			return new JsonResponse($responseArray);
 		}
 
 		$em->persist($user);
 		$em->flush();
 
-		return new Response(sprintf('User %s successfully created', $user->getEmail()));
+		$responseArray['code'] = 200;
+		$responseArray['message'] = 'Succesfully';
+		return new JsonResponse($responseArray);
 	}
 }

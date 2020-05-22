@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Table(name="user")
  * @ORM\Entity
- * @UniqueEntity(fields={"email"}, message="I think you're already registered!")
+ * @UniqueEntity(fields={"email"}, message="I think you are already registered!")
  */
 class User implements UserInterface
 {

@@ -47,4 +47,31 @@ class RoomRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function transform(Room $room)
+    {
+        return [
+            'id' => $room->getId(),
+            'owner' => [
+                
+            ],
+            'name' => $room->getName(),
+            'description' => $room->getDescription(),
+            'qr_url' => $room->getQrUrl(),
+            'start_time' => $room->getStartTime(),
+        ];
+    }
+
+    public function transformAll()
+    {
+        $rooms = $this->findAll();
+        $roomsArray = [];
+
+        foreach($rooms as $room)
+        {
+            $roomsArray[] = $this->transform($room);
+        }
+
+        return $roomsArray;
+    }
 }
