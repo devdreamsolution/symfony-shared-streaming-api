@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RoomController extends AbstractController
 {
+    /**
+     * All room list
+     * @param RoomRepository
+     * @return jsonArray[]
+     */
     public function roomList(RoomRepository $roomRepository)
     {
         $roomList = $roomRepository->transformAll();
@@ -19,6 +24,12 @@ class RoomController extends AbstractController
         return new JsonResponse($roomList);
     }
 
+    /**
+     * Create room
+     * @param Request
+     * @param ValidatorInterface
+     * @return jsonArray[]
+     */
     public function roomCreate(Request $request, ValidatorInterface $validator)
     {
         $responseArray = [];
@@ -39,7 +50,7 @@ class RoomController extends AbstractController
 
         $room = new Room();
         $room->setOwner($owner);
-        $room->addUser($owner);
+        $room->addUser($owner);                                             // yet not multi, that is needed multi like message add receivers
         $room->setName($name);
         $room->setDescription($description);
         $room->setQrUrl($qr_url);
@@ -66,6 +77,12 @@ class RoomController extends AbstractController
         return new JsonResponse($responseArray);
     }
 
+    /**
+     * Delete room
+     * @param roomID
+     * @param RoomRepository
+     * @return jsonArray[]
+     */
     public function roomDelete($id, RoomRepository $roomRepository)
     {
         $responseArray = [];
