@@ -14,6 +14,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
+	/**
+	 * Register user
+	 * @param Request
+	 * @param UserPasswordEncoderInterface
+	 * @param ValidatorInterface
+	 * @return jsonArray[]
+	 */
 	public function userRegister(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
 	{
 		$responseArray = [];
