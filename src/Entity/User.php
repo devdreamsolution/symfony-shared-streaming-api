@@ -39,6 +39,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=500)
+     * @Assert\NotBlank()
+     * Assert\Length(["max" => 100])
      */
     private $roles;
 
@@ -521,6 +523,18 @@ class User implements UserInterface
                 $myRecord->setRecorder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }
