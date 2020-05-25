@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Room;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
  * @method Room|null find($id, $lockMode = null, $lockVersion = null)
@@ -48,13 +49,16 @@ class RoomRepository extends ServiceEntityRepository
     }
     */
 
+    /**
+     * Get room data
+     * @param Room
+     * @return array[]
+     */
     public function transform(Room $room)
     {
         return [
             'id' => $room->getId(),
-            'owner' => [
-                
-            ],
+            'owner' => $this->getOwner($room->getOwner()),
             'name' => $room->getName(),
             'description' => $room->getDescription(),
             'qr_url' => $room->getQrUrl(),
@@ -62,6 +66,10 @@ class RoomRepository extends ServiceEntityRepository
         ];
     }
 
+    /**
+     * All rooms list
+     * @return array[]
+     */
     public function transformAll()
     {
         $rooms = $this->findAll();
@@ -73,5 +81,20 @@ class RoomRepository extends ServiceEntityRepository
         }
 
         return $roomsArray;
+    }
+
+    /**
+     * Get owner data of room
+     * @param User
+     * @return array[]
+     */
+    public function getOwner(User $user)
+    {
+        return [
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'surename' => $user->getSurename(),
+            'roles' => $user->getRoles(),
+        ];
     }
 }
