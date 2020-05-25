@@ -19,6 +19,14 @@ room_delete:
     path: /room/{id}/delete
     controller: App\Controller\RoomController::roomDelete
 
+audio_create:
+    path: /audio/create
+    controller: App\Controller\AudioController:audioCreate
+
+message_create:
+    path: /message/create
+    controller: App\Controller\MessageController:messageCreate
+
 api:
     path: /api
     controller: App\Controller\DefaultController::api
