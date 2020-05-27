@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=AudioRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Audio
 {
@@ -43,6 +44,13 @@ class Audio
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
+
+    public function __construct(Room $room, User $recorder, string $audio_path)
+    {
+        $this->room = $room;
+        $this->recorder = $recorder;
+        $this->audio_path = $audio_path;
+    }
 
     public function getId(): ?int
     {
@@ -90,22 +98,26 @@ class Audio
         return $this->created_at;
     }
 
-    public function setCreatedAt(): self
-    {
-        $this->created_at = new \DateTime();
-        $this->setUpdatedAt();
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(): self
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
     {
         $this->updated_at = new \DateTime();
-
-        return $this;
     }
+
 }
