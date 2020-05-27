@@ -4,34 +4,5 @@ user_register:
     methods: POST
 
 login_check:
-    path: /login_check
+    path: /login/token
     methods: [POST]
-
-room_list:
-    path: /room/list
-    controller: App\Controller\RoomController::roomList
-
-room_create:
-    path: /room/create
-    controller: App\Controller\RoomController::roomCreate
-
-room_delete:
-    path: /room/{id}/delete
-    controller: App\Controller\RoomController::roomDelete
-
-audio_create:
-    path: /audio/create
-    controller: App\Controller\AudioController:audioCreate
-
-message_create:
-    path: /message/create
-    controller: App\Controller\MessageController:messageCreate
-
-api:
-    path: /api
-    controller: App\Controller\DefaultController::api
-
-
-
-
-

@@ -3,13 +3,15 @@
 namespace App\Entity;
 
 use App\Repository\RoomRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=RoomRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Room
 {
@@ -21,33 +23,29 @@ class Room
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
-     * Assert\Length(["max" => 100])
-     */
-    private $name;
-
-    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="my_rooms")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $owner;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="other_rooms")
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
-    private $users;
+    private $name;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="other_rooms")
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * Assert\Length(["max" => 100])
      */
     private $description;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
      */
     private $qr_url;
 
@@ -67,37 +65,31 @@ class Room
     private $updated_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="room", orphanRemoval=true)
-     */
-    private $messages;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Audio::class, mappedBy="room", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Audio::class, mappedBy="room")
      */
     private $audios;
 
-    public function __construct()
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="room")
+     */
+    private $messages;
+
+    public function __construct(User $owner, string $name, string $description, string $qr_url, DateTime $start_time)
     {
-        $this->users = new ArrayCollection();
-        $this->messages = new ArrayCollection();
+        $this->user = new ArrayCollection();
+
+        $this->owner = $owner;
+        $this->name = $name;
+        $this->description = $description;
+        $this->qr_url = $qr_url;
+        $this->start_time = $start_time;
         $this->audios = new ArrayCollection();
+        $this->messages = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getOwner(): ?User
@@ -112,18 +104,30 @@ class Room
         return $this;
     }
 
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
     /**
      * @return Collection|User[]
      */
-    public function getUsers(): Collection
+    public function getUser(): Collection
     {
-        return $this->users;
+        return $this->user;
     }
 
     public function addUser(User $user): self
     {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
+        if (!$this->user->contains($user)) {
+            $this->user[] = $user;
         }
 
         return $this;
@@ -131,8 +135,8 @@ class Room
 
     public function removeUser(User $user): self
     {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
+        if ($this->user->contains($user)) {
+            $this->user->removeElement($user);
         }
 
         return $this;
@@ -143,7 +147,7 @@ class Room
         return $this->description;
     }
 
-    public function setDescription(?string $description): self
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
@@ -162,12 +166,12 @@ class Room
         return $this;
     }
 
-    public function getStartTime(): ?\DateTimeInterface
+    public function getStartTime(): ?\DateTime
     {
         return $this->start_time;
     }
 
-    public function setStartTime(\DateTimeInterface $start_time): self
+    public function setStartTime(\DateTime $start_time): self
     {
         $this->start_time = $start_time;
 
@@ -179,21 +183,55 @@ class Room
         return $this->created_at;
     }
 
-    public function setCreatedAt(): self
-    {
-        $this->created_at = new \DateTime();
-        $this->setUpdatedAt();
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(): self
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
     {
         $this->updated_at = new \DateTime();
+    }
+
+    /**
+     * @return Collection|Audio[]
+     */
+    public function getAudios(): Collection
+    {
+        return $this->audios;
+    }
+
+    public function addAudio(Audio $audio): self
+    {
+        if (!$this->audios->contains($audio)) {
+            $this->audios[] = $audio;
+            $audio->setRoom($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAudio(Audio $audio): self
+    {
+        if ($this->audios->contains($audio)) {
+            $this->audios->removeElement($audio);
+            // set the owning side to null (unless already changed)
+            if ($audio->getRoom() === $this) {
+                $audio->setRoom(null);
+            }
+        }
 
         return $this;
     }
@@ -223,37 +261,6 @@ class Room
             // set the owning side to null (unless already changed)
             if ($message->getRoom() === $this) {
                 $message->setRoom(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Audio[]
-     */
-    public function getAudios(): Collection
-    {
-        return $this->audios;
-    }
-
-    public function addAudio(Audio $audio): self
-    {
-        if (!$this->audios->contains($audio)) {
-            $this->audios[] = $audio;
-            $audio->setRoom($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAudio(Audio $audio): self
-    {
-        if ($this->audios->contains($audio)) {
-            $this->audios->removeElement($audio);
-            // set the owning side to null (unless already changed)
-            if ($audio->getRoom() === $this) {
-                $audio->setRoom(null);
             }
         }
 

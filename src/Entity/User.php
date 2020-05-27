@@ -2,64 +2,55 @@
 
 namespace App\Entity;
 
-use DateTimeInterface;
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Table(name="user")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"email"}, message="I think you are already registered!")
  */
 class User implements UserInterface
 {
     /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=25, unique=true)
+     * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\NotBlank()
      * @Assert\Email()
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=500)
-     * @Assert\NotBlank()
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
+
+    /**
+     * @var string The hashed password
+     * @ORM\Column(type="string")
      */
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=500)
-     * @Assert\NotBlank()
-     * Assert\Length(["max" => 100])
-     */
-    private $roles;
-
-    /**
-     * @ORM\Column(name="is_active", type="boolean")
-     */
-    private $isActive;
-
-    /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * Assert\Length(["max" => 100])
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
-     * Assert\Length(["max" => 100])
      */
     private $surename;
 
@@ -82,13 +73,11 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * Assert\Length(["max" => 200])
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * Assert\Length(["max" => 200])
      */
     private $city_residence;
 
@@ -99,16 +88,16 @@ class User implements UserInterface
     private $group_age;
 
     /**
+     * Gender 0: none, 1: male, 2: fermale
      * @ORM\Column(type="smallint", nullable=true)
      * @Assert\PositiveOrZero()
-     * $gender == 1 : male, $gender == 2 : fermale
      */
     private $gender;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $lang = 'en';
+    private $lang;
 
     /**
      * @ORM\Column(type="datetime")
@@ -121,17 +110,22 @@ class User implements UserInterface
     private $updated_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Room::class, mappedBy="owner", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Room::class, mappedBy="owner")
      */
     private $my_rooms;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Room::class, mappedBy="users")
+     * @ORM\ManyToMany(targetEntity=Room::class, mappedBy="user")
      */
     private $other_rooms;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="sender", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Audio::class, mappedBy="recorder")
+     */
+    private $my_audios;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="sender")
      */
     private $send_messages;
 
@@ -140,19 +134,17 @@ class User implements UserInterface
      */
     private $receive_messages;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Audio::class, mappedBy="recorder", orphanRemoval=true)
-     */
-    private $my_records;
-
-    public function __construct()
+    public function __construct(string $email, string $name, string $surename, $lang = 'en')
     {
-        $this->isActive = true;
+        $this->email = $email;
+        $this->name = $name;
+        $this->surename = $surename;
+        $this->lang = $lang;
         $this->my_rooms = new ArrayCollection();
         $this->other_rooms = new ArrayCollection();
+        $this->my_audios = new ArrayCollection();
         $this->send_messages = new ArrayCollection();
-        $this->receive_messages = new ArrayCollection();
-        $this->my_records = new ArrayCollection();
+        $this->contents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,11 +165,30 @@ class User implements UserInterface
     }
 
     /**
+     * A visual identifier that represents this user.
+     *
      * @see UserInterface
      */
-    public function getSalt()
+    public function getUsername(): string
     {
-        // not needed when using the "bcrypt" algorithm in security.yaml
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     /**
@@ -196,31 +207,11 @@ class User implements UserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
-     *
      * @see UserInterface
      */
-    public function getUsername(): string
+    public function getSalt()
     {
-        return (string) $this->email;
-    }
-
-    /**
-     * Returns the roles or permissions granted to the user for security.
-     */
-    public function getRoles(): array
-    {
-        $roles[] = $this->roles;
-
-        return array_unique($roles);
-    }
-
-
-    public function setRoles(string $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
+        // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
     /**
@@ -357,25 +348,26 @@ class User implements UserInterface
         return $this->created_at;
     }
 
-    public function setCreatedAt(): self
-    {
-        $this->created_at = new \DateTime();
-
-        $this->setUpdatedAt();
-        
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(): self
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
     {
         $this->updated_at = new \DateTime();
-
-        return $this;
     }
 
     /**
@@ -438,6 +430,37 @@ class User implements UserInterface
     }
 
     /**
+     * @return Collection|Audio[]
+     */
+    public function getMyAudios(): Collection
+    {
+        return $this->my_audios;
+    }
+
+    public function addMyAudio(Audio $myAudio): self
+    {
+        if (!$this->my_audios->contains($myAudio)) {
+            $this->my_audios[] = $myAudio;
+            $myAudio->setRecorder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyAudio(Audio $myAudio): self
+    {
+        if ($this->my_audios->contains($myAudio)) {
+            $this->my_audios->removeElement($myAudio);
+            // set the owning side to null (unless already changed)
+            if ($myAudio->getRecorder() === $this) {
+                $myAudio->setRecorder(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection|Message[]
      */
     public function getSendMessages(): Collection
@@ -476,65 +499,22 @@ class User implements UserInterface
         return $this->receive_messages;
     }
 
-    public function addReceiveMessage(Message $receiveMessage): self
+    public function addReceiveMessage(Message $receive_message): self
     {
-        if (!$this->receive_messages->contains($receiveMessage)) {
-            $this->receive_messages[] = $receiveMessage;
-            $receiveMessage->addReceiver($this);
+        if (!$this->receive_messages->contains($receive_message)) {
+            $this->receive_messages[] = $receive_message;
+            $receive_message->addReceiver($this);
         }
 
         return $this;
     }
 
-    public function removeReceiveMessage(Message $receiveMessage): self
+    public function removeReceiveMessages(Message $receive_message): self
     {
-        if ($this->receive_messages->contains($receiveMessage)) {
-            $this->receive_messages->removeElement($receiveMessage);
-            $receiveMessage->removeReceiver($this);
+        if ($this->receive_messages->contains($receive_message)) {
+            $this->receive_messages->removeElement($receive_message);
+            $receive_message->removeReceiver($this);
         }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Audio[]
-     */
-    public function getMyRecords(): Collection
-    {
-        return $this->my_records;
-    }
-
-    public function addMyRecord(Audio $myRecord): self
-    {
-        if (!$this->my_records->contains($myRecord)) {
-            $this->my_records[] = $myRecord;
-            $myRecord->setRecorder($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMyRecord(Audio $myRecord): self
-    {
-        if ($this->my_records->contains($myRecord)) {
-            $this->my_records->removeElement($myRecord);
-            // set the owning side to null (unless already changed)
-            if ($myRecord->getRecorder() === $this) {
-                $myRecord->setRecorder(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getIsActive(): ?bool
-    {
-        return $this->isActive;
-    }
-
-    public function setIsActive(bool $isActive): self
-    {
-        $this->isActive = $isActive;
 
         return $this;
     }
