@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * @Route("/message", name="message")
+ */
 class MessageController extends AbstractController
 {
     /**
@@ -22,11 +25,10 @@ class MessageController extends AbstractController
      * @param UserRepository
      * @param ValidatorInterface
      * @return jsonArray[]
+     * @Route("/create", name="message_create", methods={"POST"})
      */
     public function messageCreate(Request $request, RoomRepository $roomRepository, UserRepository $userRepository, ValidatorInterface $validator)
     {
-        $responseArray = [];
-
         $em = $this->getDoctrine()->getManager();
         
         $room_id = $request->request->get('room_id');
@@ -72,7 +74,6 @@ class MessageController extends AbstractController
         $message->setRoom($room);
         $message->setContents($contents);
         $message->setStatus($status);
-        $message->setCreatedAt();
 
         $errors = $validator->validate($message);
         if(count($errors) > 0)
