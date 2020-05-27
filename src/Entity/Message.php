@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=MessageRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Message
 {
@@ -22,30 +23,27 @@ class Message
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="send_messages")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $sender;
 
     /**
-     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="receive_messages")
+     * @ORM\ManyToOne(targetEntity=Room::class, inversedBy="messages")
+     */
+    private $room;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="contents")
      */
     private $receiver;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Assert\NotNull
      */
     private $contents;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Room::class, inversedBy="messages")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $room;
-
-    /**
+     * $status == true ? read : unread
      * @ORM\Column(type="boolean")
-     * $status == false ? not read, $status == true ? read
      */
     private $status = false;
 
@@ -77,6 +75,18 @@ class Message
     public function setSender(?User $sender): self
     {
         $this->sender = $sender;
+
+        return $this;
+    }
+
+    public function getRoom(): ?Room
+    {
+        return $this->room;
+    }
+
+    public function setRoom(?Room $room): self
+    {
+        $this->room = $room;
 
         return $this;
     }
@@ -119,24 +129,12 @@ class Message
         return $this;
     }
 
-    public function getRoom(): ?Room
-    {
-        return $this->room;
-    }
-
-    public function setRoom(?Room $room): self
-    {
-        $this->room = $room;
-
-        return $this;
-    }
-
-    public function getStatus(): ?int
+    public function getStatus(): ?bool
     {
         return $this->status;
     }
 
-    public function setStatus(int $status): self
+    public function setStatus(bool $status): self
     {
         $this->status = $status;
 
@@ -148,22 +146,25 @@ class Message
         return $this->created_at;
     }
 
-    public function setCreatedAt(): self
-    {
-        $this->created_at = new \DateTime();
-        $this->setUpdatedAt();
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTime
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(): self
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
     {
         $this->updated_at = new \DateTime();
-
-        return $this;
     }
 }
