@@ -2,65 +2,70 @@
 
 namespace App\Controller;
 
-use App\Entity\Message;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use App\Entity\User;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * @Route("/user")
+ */
 class UserController extends AbstractController
 {
-	/**
-	 * Register user
-	 * @param Request
-	 * @param UserPasswordEncoderInterface
-	 * @param ValidatorInterface
-	 * @return jsonArray[]
-	 */
-	public function userRegister(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
+    /**
+     * Register user
+     * @param Request
+     * @param UserPasswordEncoderInterface
+     * @param ValidatorInterface
+     * @return jsonArray[]
+     * @Route("/register", name="user_register", methods={"POST"})
+     */
+    public function userRegister(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
 	{
-		$responseArray = [];
 		$em = $this->getDoctrine()->getManager();
 
 		$email = $request->request->get('username');
 		$password = $request->request->get('password');
 		$name = $request->request->get('name');
 		$surename = $request->request->get('surename');
-		$roles = $request->request->get('roles');
+        $roles = $request->request->get('roles');
+        $lang = $request->request->get('lang');
+        
+        $user = new User($email, $name, $surename, $lang);
 
-		$user = new User();
-		if ($roles == 0)								// ROLE_TOURIST
+		if ($roles == 0)    // ROLE_TOURIST
 		{
 			$city_residence = $request->request->get('city_residence');
 			$group_age = $request->request->get('group_age');
 			$gender = $request->request->get('gender');
-
-			$user->setCityResidence($city_residence);
-			$user->setGroupAge($group_age);
-			$user->setGender($gender);
-			$user->setRoles('ROLE_TOURIST');
+            $roles = ['ROLE_TOURIST'];
+            
+            $user->setCityResidence($city_residence);
+            $user->setGroupAge($group_age);
+            $user->setGender($gender);
 		}
-		else if ($roles == 1)						// ROLE_GUIDE
+		else if ($roles == 1)   // ROLE_GUIDE
 		{
+            $picture = '';  // file upload
 			$age = $request->request->get('age');
 			$vat = $request->request->get('vat');
-			$address = $request->request->get('address');
+            $address = $request->request->get('address');
+            $roles = ['ROLE_GUIDE'];
 
-			$user->setRoles('ROLE_GUIDE');
-			$user->setPicture('');              // file upload
-			$user->setAge($age);
-			$user->setVat($vat);
-			$user->setAddress($address);
-		}
-		$user->setEmail($email);
-		$user->setName($name);
-		$user->setSurename($surename);
-		$user->setPassword($encoder->encodePassword($user, $password));
-		$user->setCreatedAt();
+            $user->setPicture($picture);
+            $user->setAge($age);
+            $user->setVat($vat);
+            $user->setAddress($address);
+        }
+        else    // ROLE_ADMIN
+        {
+            $roles = ['ROLE_GUIDE', 'ROLE_TOURIST'];
+        }
+        $user->setPassword($encoder->encodePassword($user, $password));
+        $user->setRoles($roles);
 
 		$errors = $validator->validate($user);
 		if (count($errors) > 0) {
@@ -68,16 +73,14 @@ class UserController extends AbstractController
 			{
 				$key = $error->getPropertyPath();
 				$responseArray['code'] = $error->getCode();
-				$responseArray[$key] = $error->getMessage();
-			}
-			return new JsonResponse($responseArray);
+                $responseArray[$key] = $error->getMessage();
+            }
+            return new JsonResponse($responseArray);
 		}
 
 		$em->persist($user);
 		$em->flush();
 
-		$responseArray['code'] = 200;
-		$responseArray['message'] = 'Succesfully';
-		return new JsonResponse($responseArray);
+		return new JsonResponse('Successfully');
 	}
 }
