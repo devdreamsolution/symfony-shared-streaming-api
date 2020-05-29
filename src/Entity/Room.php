@@ -65,12 +65,12 @@ class Room
     private $updated_at;
 
     /**
-     * @ORM\OneToMany(targetEntity=Audio::class, mappedBy="room")
+     * @ORM\OneToMany(targetEntity=Audio::class, mappedBy="room", orphanRemoval=true)
      */
     private $audios;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="room")
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="room", orphanRemoval=true)
      */
     private $messages;
 
@@ -204,6 +204,19 @@ class Room
     {
         $this->updated_at = new \DateTime();
     }
+
+    /**
+     * @ORM\PreRemove
+     */
+    // public function preRemove()
+    // {
+    //     $audios = $this->getAudios();
+
+    //     foreach($audios as $audio)
+    //     {
+    //         $this->removeAudio($audio);
+    //     }
+    // }
 
     /**
      * @return Collection|Audio[]
