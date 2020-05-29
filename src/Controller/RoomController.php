@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Room;
+use App\Repository\RoomRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +16,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RoomController extends AbstractController
 {
     /**
+     * Create room
+     * Only user who has ROLE_GUIDE as role can access.
+     * @param Request
+     * @param ValidatorInterface
+     * @return jsonArray[]
      * @Route("/create", name="room_create", methods={"POST"})
      */
     public function roomCreate(Request $request, ValidatorInterface $validator)
@@ -56,4 +62,36 @@ class RoomController extends AbstractController
         return new JsonResponse('Successfully');
     }
 
+    /**
+     * Delete room
+     * Only owner can access to delete room.
+     * @param int $room_id
+     * @param RoomRepository
+     * @return jsonArray[]
+     * @Route("/{room_id}/delete", name="room_delete", methods={"POST"})
+     */
+    public function roomDelete(int $room_id, RoomRepository $roomRepository)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $room = $roomRepository->find($room_id);
+        if(!$room)
+        {
+            $responseArray['code'] = 400;
+            $responseArray['message'] = 'The room is already not existed.';
+            return new JsonResponse($responseArray);
+        }
+
+        if($this->getUser() != $room->getOwner())       // Only owner can delete the room.
+        {
+            $responseArray['code'] = 401;
+            $responseArray['message'] = "You can not delete this room because of not owner.";
+            return new JsonResponse($responseArray);
+        }
+
+        $em->remove($room);
+        $em->flush();
+
+        return new JsonResponse('Successfully');
+    }
 }
