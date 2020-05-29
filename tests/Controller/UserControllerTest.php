@@ -6,7 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UserControllerTest extends WebTestCase
 {
-
+	/**
+	 * User register unit test
+	 */
 	public function testUserRegister()
 	{
 		$client = static::createClient();
