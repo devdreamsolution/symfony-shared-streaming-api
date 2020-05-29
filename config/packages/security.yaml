@@ -8,11 +8,12 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
-
+    
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+            
         login:
             pattern:  ^/login
             stateless: true
@@ -35,6 +36,8 @@ security:
             guard:
                 authenticators:
                     - lexik_jwt_authentication.jwt_token_authenticator
+            
+            http_basic: ~
             
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
