@@ -60,7 +60,7 @@ class UserController extends AbstractController
             $user->setVat($vat);
             $user->setAddress($address);
         }
-        else    // ROLE_ADMIN
+        else    // ROLE_ADMIN (ROLE_GUIDE, ROLE_TOURIST)
         {
             $roles = ['ROLE_GUIDE', 'ROLE_TOURIST'];
         }
