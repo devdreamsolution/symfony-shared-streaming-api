@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\User;
+use App\Entity\Room;
 use App\Repository\MessageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -57,9 +59,14 @@ class Message
      */
     private $updated_at;
 
-    public function __construct()
+    public function __construct(User $sender, Room $room, string $contents, bool $status = false)
     {
         $this->receiver = new ArrayCollection();
+
+        $this->sender = $sender;
+        $this->room = $room;
+        $this->contents = $contents;
+        $this->status = $status;
     }
 
     public function getId(): ?int
