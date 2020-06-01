@@ -56,6 +56,8 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
+     * @Assert\File(mimeTypes={ "image/png", "image/jpeg" })
      */
     private $picture;
 
