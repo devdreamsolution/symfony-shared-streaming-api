@@ -26,4 +26,19 @@ class RoomControllerTest extends WebTestCase
 
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
+
+	/**
+	 * Room delete unit test
+	 */
+	public function testRoomDelete()
+	{
+		$client = static::createClient([], [
+			'PHP_AUTH_USER' => $this->username,
+			'PHP_AUTH_PW' => $this->password,
+		]);
+
+		$client->request('POST', '/room/3/delete');
+		
+		$this->assertEquals(200, $client->getResponse()->getStatusCode());
+	}
 }
