@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/room")
+ * @Route("/api/room")
  */
 class RoomController extends AbstractController
 {
