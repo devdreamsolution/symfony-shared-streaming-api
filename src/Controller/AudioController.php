@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/audio", name="audio")
+ * @Route("/api/audio", name="audio")
  */
 class AudioController extends AbstractController
 {
@@ -38,6 +38,7 @@ class AudioController extends AbstractController
         }
         
         $room_id = $request->request->get('room_id');
+        $audio = $request->files->get('audio');
 
         $room = $roomRepository->find($room_id);
         if(!$room)
@@ -47,9 +48,8 @@ class AudioController extends AbstractController
             return new JsonResponse($responseArray);
         }
         $recorder = $this->getUser();
-        $audio_path = 'http://shared/audio.mp3';    // after uploading the audio file, put the path.
         
-        $audio = new Audio($room, $recorder, $audio_path);
+        $audio = new Audio($room, $recorder, $audio);
 
         $errors = $validator->validate($audio);
         if(count($errors) > 0)
