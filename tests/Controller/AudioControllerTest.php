@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AudioControllerTest extends WebTestCase
 {
@@ -19,8 +20,16 @@ class AudioControllerTest extends WebTestCase
 			'PHP_AUTH_PW' => $this->password,
 		]);
 
-		$client->request('POST', '/audio/create', [
-			'room_id' => 5
+		$audio = new UploadedFile(
+			'path/audio.wav',
+			'audio.wav',
+			'audio/wav',
+			24
+		);
+		
+		$client->request('POST', '/api/audio/create', [
+			'room_id' => 5,
+			'audio' => $audio,
 		]);
 
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
@@ -36,7 +45,7 @@ class AudioControllerTest extends WebTestCase
 			'PHP_AUTH_PW' => $this->password,
 		]);
 
-		$client->request('POST', '/audio/3/delete');
+		$client->request('POST', '/api/audio/3/delete');
 
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
