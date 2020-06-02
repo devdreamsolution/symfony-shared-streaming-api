@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -56,8 +57,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\NotBlank()
-     * @Assert\File(mimeTypes={ "image/png", "image/jpeg" })
+     * @Assert\Image()
      */
     private $picture;
 
@@ -136,12 +136,21 @@ class User implements UserInterface
      */
     private $receive_messages;
 
-    public function __construct(string $email, string $name, string $surename, $lang = 'en')
+    public function __construct(string $email, $name, $surename, array $roles, string $lang = 'en', $city_residence = null, $address = null, int $group_age = null, $gender = null, $age = null, float $vat = null, File $picture = null)
     {
         $this->email = $email;
         $this->name = $name;
         $this->surename = $surename;
+        $this->roles = $roles;
         $this->lang = $lang;
+        $this->city_residence = $city_residence;
+        $this->group_age = $group_age;
+        $this->gender = $gender;
+        $this->age = $age;
+        $this->vat = $vat;
+        $this->address = $address;
+        $this->picture = $picture;
+
         $this->my_rooms = new ArrayCollection();
         $this->other_rooms = new ArrayCollection();
         $this->my_audios = new ArrayCollection();
@@ -254,9 +263,14 @@ class User implements UserInterface
         return $this->picture;
     }
 
-    public function setPicture(?string $picture): self
+    public function setPicture(?File $picture = null): self
     {
-        $this->picture = $picture;
+        if ($picture) {
+            $uploadDir = 'uploads\pictures';
+            $fileName = md5(uniqid()) . '.' . $picture->guessExtension();
+            $path = $picture->move($uploadDir, $fileName);
+            $this->picture = $path;
+        }
 
         return $this;
     }
@@ -360,6 +374,15 @@ class User implements UserInterface
      */
     public function prePersist()
     {
+        // picture upload
+        if ($this->picture) {
+            $uploadDir = 'uploads\pictures';
+            $fileName = md5(uniqid()) . '.' . $this->picture->guessExtension();
+            $path = $this->picture->move($uploadDir, $fileName);
+            $this->picture = $path;
+        }
+
+        // created at
         $this->created_at = new \DateTime();
         $this->updated_at = new \DateTime();
     }
@@ -369,6 +392,15 @@ class User implements UserInterface
      */
     public function preUpdate()
     {
+        // picture upload
+        if ($this->picture) {
+            $uploadDir = 'uploads\pictures';
+            $fileName = md5(uniqid()) . '.' . $this->picture->guessExtension();
+            $path = $this->picture->move($uploadDir, $fileName);
+            $this->picture = $path;
+        }
+
+        // updated at
         $this->updated_at = new \DateTime();
     }
 
