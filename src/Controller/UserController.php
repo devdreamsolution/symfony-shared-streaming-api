@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * @Route("/user")
+ * @Route("/api/user")
  */
 class UserController extends AbstractController
 {
@@ -33,44 +33,30 @@ class UserController extends AbstractController
 		$surename = $request->request->get('surename');
         $roles = $request->request->get('roles');
         $lang = $request->request->get('lang');
-        
-        $user = new User($email, $name, $surename, $lang);
+        $city_residence = $request->request->get('city_residence');
+        $group_age = $request->request->get('group_age');
+        $gender = $request->request->get('gender');
+        $age = $request->request->get('age');
+        $vat = $request->request->get('vat');
+        $address = $request->request->get('address');
+        $picture = $request->files->get('picture');  // file upload
 
-		if ($roles == 0)    // ROLE_TOURIST
-		{
-			$city_residence = $request->request->get('city_residence');
-			$group_age = $request->request->get('group_age');
-			$gender = $request->request->get('gender');
+		if ($roles == 0) {          // ROLE_TOURIST
             $roles = ['ROLE_TOURIST'];
-            
-            $user->setCityResidence($city_residence);
-            $user->setGroupAge($group_age);
-            $user->setGender($gender);
 		}
-		else if ($roles == 1)   // ROLE_GUIDE
-		{
-            $picture = '';  // file upload
-			$age = $request->request->get('age');
-			$vat = $request->request->get('vat');
-            $address = $request->request->get('address');
+		else if ($roles == 1) {    // ROLE_GUIDE
             $roles = ['ROLE_GUIDE'];
-
-            $user->setPicture($picture);
-            $user->setAge($age);
-            $user->setVat($vat);
-            $user->setAddress($address);
         }
-        else    // ROLE_ADMIN (ROLE_GUIDE, ROLE_TOURIST)
-        {
+        else {                     // ROLE_ADMIN (ROLE_GUIDE, ROLE_TOURIST)
             $roles = ['ROLE_GUIDE', 'ROLE_TOURIST'];
         }
+
+        $user = new User($email, $name, $surename, $roles, $lang, $city_residence, $address, $group_age, $gender, $age, $vat, $picture);
         $user->setPassword($encoder->encodePassword($user, $password));
-        $user->setRoles($roles);
 
 		$errors = $validator->validate($user);
 		if (count($errors) > 0) {
-			foreach($errors as $error)
-			{
+			foreach($errors as $error) {
 				$key = $error->getPropertyPath();
 				$responseArray['code'] = $error->getCode();
                 $responseArray[$key] = $error->getMessage();
