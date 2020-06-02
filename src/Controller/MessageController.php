@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/message", name="message")
+ * @Route("/api/message", name="message")
  */
 class MessageController extends AbstractController
 {
