@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AudioRepository;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -32,8 +34,10 @@ class Audio
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\File(mimeTypes = {"audio/x-wav", "audio/wmv"})
+     * @Assert\NotBlank()
      */
-    private $audio_path;
+    private $audio;
 
     /**
      * @ORM\Column(type="datetime")
@@ -45,11 +49,11 @@ class Audio
      */
     private $updated_at;
 
-    public function __construct(Room $room, User $recorder, string $audio_path)
+    public function __construct(Room $room, User $recorder, File $audio)
     {
         $this->room = $room;
         $this->recorder = $recorder;
-        $this->audio_path = $audio_path;
+        $this->audio = $audio;
     }
 
     public function getId(): ?int
@@ -81,14 +85,20 @@ class Audio
         return $this;
     }
 
-    public function getAudioPath(): ?string
+    public function getAudio(): ?string
     {
-        return $this->audio_path;
+        return $this->audio;
     }
 
-    public function setAudioPath(string $audio_path): self
+    public function setAudio(File $audio): self
     {
-        $this->audio_path = $audio_path;
+        $this->audio = $audio;
+        if ($audio) {
+            $uploadDir = 'uploads\audios';
+            $fileName = md5(uniqid()) . '.' . $audio->guessExtension();
+            $path = $audio->move($uploadDir, $fileName);
+            $this->audio = $path;
+        }
 
         return $this;
     }
@@ -108,6 +118,14 @@ class Audio
      */
     public function prePersist()
     {
+        // audio upload
+        if ($this->audio) {
+            $uploadDir = 'uploads\audios';
+            $fileName = md5(uniqid()) . '.' . $this->audio->guessExtension();
+            $path = $this->audio->move($uploadDir, $fileName);
+            $this->audio = $path;
+        }
+
         $this->created_at = new \DateTime();
         $this->updated_at = new \DateTime();
     }
