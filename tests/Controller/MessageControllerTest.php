@@ -19,7 +19,7 @@ class MessageControllerTest extends WebTestCase
             'PHP_AUTH_PW' => $this->password,
         ]);
 
-		$client->request('POST', '/message/create', [
+		$client->request('POST', '/api/message/create', [
 			'room_id' => 3,
 			'contents' => 'this is test message',
 			'receiver_id' => [
