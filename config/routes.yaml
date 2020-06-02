@@ -1,8 +1,13 @@
 user_register:
-    path: /user/register
+    path: /api/user/register
     controller: App\Controller\UserController::userRegister
     methods: POST
 
 login_check:
-    path: /login/token
+    path: /api/login/token
     methods: [POST]
+
+app.swagger_ui:
+    path: /doc
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
