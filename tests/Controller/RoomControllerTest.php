@@ -19,7 +19,7 @@ class RoomControllerTest extends WebTestCase
             'PHP_AUTH_PW' => $this->password,
         ]);
 
-		$client->request('POST', '/room/create', [
+		$client->request('POST', '/api/room/create', [
 			'name' => 'name',
 			'description' => 'description'
 		]);
@@ -37,7 +37,7 @@ class RoomControllerTest extends WebTestCase
 			'PHP_AUTH_PW' => $this->password,
 		]);
 
-		$client->request('POST', '/room/3/delete');
+		$client->request('POST', '/api/room/3/delete');
 		
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
