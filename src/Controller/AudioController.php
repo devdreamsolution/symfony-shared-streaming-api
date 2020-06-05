@@ -29,31 +29,22 @@ class AudioController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
 
-        if(!$this->isGranted('ROLE_GUIDE'))
-        {
-            $responseArray['code'] = 403;
-            $responseArray['message'] = 'Only ROLE_GUIDE can access this function';
-
-            return new JsonResponse($responseArray);
-        }
-        
         $room_id = $request->request->get('room_id');
-        $audio = $request->files->get('audio');
+        $file = $request->files->get('audio');
 
         $room = $roomRepository->find($room_id);
-        if(!$room)
-        {
+        if (!$room) {
             $responseArray['code'] = 400;
             $responseArray['message'] = 'The room is not existed.';
             return new JsonResponse($responseArray);
         }
         $recorder = $this->getUser();
         
-        $audio = new Audio($room, $recorder, $audio);
+        $audio = new Audio($room, $recorder, $file);
 
+        $this->denyAccessUnlessGranted('CREATE', $audio);
         $errors = $validator->validate($audio);
-        if(count($errors) > 0)
-        {
+        if(count($errors) > 0) {
             foreach($errors as $error)
             {
                 $key = $error->getPropertyPath();
@@ -70,31 +61,69 @@ class AudioController extends AbstractController
     }
 
     /**
+     * Edit audio
+     * Only user who is recorder of this audio can edit
+     * @param Audio $audio
+     * @param int $audio_id
+     * @param Request $request
+     * @param ValidatorInderface $validator
+     * @Route("/{audio_id}/edit", name="audio_edit", methods={"POST"})
+     */
+    public function audioEdit($audio_id, Request $request, AudioRepository $audioRepository, ValidatorInterface $validator)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $audio = $audioRepository->find($audio_id);
+        if (!$audio) {
+            $responseArray['code'] = 400;
+            $responseArray['message'] = 'The audio is not existed';
+            return new JsonResponse($responseArray);
+        }
+        
+        $this->denyAccessUnlessGranted('EDIT', $audio);
+        
+        $file = $request->files->get('audio');
+
+        $audio->setAudio($file);
+
+        $errors = $validator->validate($audio);
+        if(count($errors) > 0)
+        {
+            foreach($errors as $error)
+            {
+                $key = $error->getPropertyPath();
+                $responseArray['code'] = $error->getCode();
+                $responseArray[$key] = $error->getMessage();
+            }
+            return new JsonResponse($responseArray);
+        }
+
+        $em->persist($audio);
+        $em->flush();
+
+        return new JsonResponse('Successfully');
+    }
+
+    /**
      * Delete audio
      * Only user who is recorder of this audio can delete.
      * @param int $audio_id
      * @param AudioRepository
      * @return jsonArray[]
-     * @Route("/{audio_id}/delete", name="audio_delete", methods={"POST"})
+     * @Route("/{audio_id}/delete", name="audio_delete", methods={"DELETE"})
      */
     public function audioDelete(int $audio_id, AudioRepository $audioRepository)
     {
         $em = $this->getDoctrine()->getManager();
 
         $audio = $audioRepository->find($audio_id);
-        if(!$audio)
-        {
+        if (!$audio) {
             $responseArray['code'] = 400;
             $responseArray['message'] = 'The audio is already not existed';
             return new JsonResponse($responseArray);
         }
 
-        if($this->getUser() != $audio->getRecorder())   // Only the recoder can delete the audio.
-        {
-            $responseArray['code'] = 401;
-            $responseArray['message'] = 'You can not delete this audio because of not recorder.';
-            return new JsonResponse($responseArray);
-        }
+        $this->denyAccessUnlessGranted('DELETE', $audio);
 
         $em->remove($audio);
         $em->flush();
