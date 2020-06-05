@@ -15,15 +15,33 @@ class RoomControllerTest extends WebTestCase
 	public function testRoomCreate()
 	{
 		$client = static::createClient([], [
-            'PHP_AUTH_USER' => $this->username,
-            'PHP_AUTH_PW' => $this->password,
-        ]);
+			'PHP_AUTH_USER' => $this->username,
+			'PHP_AUTH_PW' => $this->password,
+		]);
 
 		$client->request('POST', '/api/room/create', [
 			'name' => 'name',
 			'description' => 'description'
 		]);
 
+		$this->assertEquals(200, $client->getResponse()->getStatusCode());
+	}
+
+	/**
+	 * Room edit unit test
+	 */
+	public function testRoomEdit()
+	{
+		$client = static::createClient([], [
+			'PHP_AUTH_USER' => $this->username,
+			'PHP_AUTH_PW' => $this->password,
+		]);
+
+		$client->request('POST', '/api/room/3/edit', [
+			'name' => 'name',
+			'description' => 'description'
+		]);
+		
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
 
@@ -37,7 +55,7 @@ class RoomControllerTest extends WebTestCase
 			'PHP_AUTH_PW' => $this->password,
 		]);
 
-		$client->request('POST', '/api/room/3/delete');
+		$client->request('DELETE', '/api/room/3/delete');
 		
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
