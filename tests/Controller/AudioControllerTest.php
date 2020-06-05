@@ -36,6 +36,30 @@ class AudioControllerTest extends WebTestCase
 	}
 
 	/**
+	 * Audio edit unit test
+	 */
+	public function testAudioEdit()
+	{
+		$client = static::createClient([], [
+			'PHP_AUTH_USER' => $this->username,
+			'PHP_AUTH_PW' => $this->password,
+		]);
+
+		$audio = new UploadedFile(
+			'path/audio.wav',
+			'audio.wav',
+			'audio/wav',
+			24
+		);
+
+		$client->request('POST', '/api/audio/3/edit', [
+			'audio' => $audio,
+		]);
+
+		$this->assertEquals(200, $client->getResponse()->getStatusCode());
+	}
+
+	/**
 	 * Audio delete unit test
 	 */
 	public function testAudioDelete()
@@ -45,7 +69,7 @@ class AudioControllerTest extends WebTestCase
 			'PHP_AUTH_PW' => $this->password,
 		]);
 
-		$client->request('POST', '/api/audio/3/delete');
+		$client->request('DELETE', '/api/audio/3/delete');
 
 		$this->assertEquals(200, $client->getResponse()->getStatusCode());
 	}
