@@ -83,6 +83,8 @@ class Room
         $this->description = $description;
         $this->qr_url = $qr_url;
         $this->start_time = $start_time;
+        $this->adduser($owner);
+
         $this->audios = new ArrayCollection();
         $this->messages = new ArrayCollection();
     }
