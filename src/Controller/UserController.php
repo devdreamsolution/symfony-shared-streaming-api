@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use ProxyManager\Factory\RemoteObject\Adapter\JsonRpc;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,21 +26,23 @@ class UserController extends AbstractController
      */
     public function userRegister(Request $request, UserPasswordEncoderInterface $encoder, ValidatorInterface $validator)
 	{
-		$em = $this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
 
-		$email = $request->request->get('username');
-		$password = $request->request->get('password');
-		$name = $request->request->get('name');
-		$surename = $request->request->get('surename');
-        $roles = $request->request->get('roles');
-        $lang = $request->request->get('lang');
-        $city_residence = $request->request->get('city_residence');
-        $group_age = $request->request->get('group_age');
-        $gender = $request->request->get('gender');
-        $age = $request->request->get('age');
-        $vat = $request->request->get('vat');
-        $address = $request->request->get('address');
-        $picture = $request->files->get('picture');  // file upload
+        $picture = $request->files->get('picture');
+        $data = json_decode($request->request->get('data'), true);
+
+        $email = $data['username'];
+        $password = $data['password'];
+        $name = $data['name'];
+        $surename = $data['surename'];
+        $roles = $data['roles'];
+        $lang = $data['lang'];
+        $city_residence = $data['city_residence'];
+        $group_age = $data['group_age'];
+        $gender = $data['gender'];
+        $age = $data['age'];
+        $vat = $data['vat'];
+        $address = $data['address'];
 
 		if ($roles == 0) {          // ROLE_TOURIST
             $roles = ['ROLE_TOURIST'];
