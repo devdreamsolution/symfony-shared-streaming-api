@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Room;
+use App\Repository\UserRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,6 +18,43 @@ class RoomRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Room::class);
+    }
+
+    /**
+     * Transform of all room
+     * @param UserRepository $userRepository
+     * @return Array[]
+     */
+    public function transformAll(UserRepository $userRepository)
+    {
+        $rooms = $this->findAll();
+        $roomsArray = [];
+
+        foreach ($rooms as $room) {
+            $roomsArray[] = $this->transform($room, $userRepository);
+        }
+
+        return $roomsArray;
+    }
+
+    /**
+     * Transform of room
+     * @param Room $room
+     * @param UserRepository $userRepository
+     * @return Array[]
+     */
+    public function transform(Room $room, UserRepository $userRepository)
+    {
+        return [
+            'id' => $room->getId(),
+            'owner' => $userRepository->transform($room->getOwner()),
+            'name' => $room->getName(),
+            'description' => $room->getDescription(),
+            'qr_url' => $room->getQrUrl(),
+            'start_time' => $room->getStartTime(),
+            'created_at' => $room->getCreatedAt(),
+            'updated_at' => $room->getUpdatedAt(),
+        ];
     }
 
     // /**
