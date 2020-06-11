@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Repository\RoomRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,6 +16,20 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class RoomController extends AbstractController
 {
+    /**
+     * List room
+     * @param RoomRepository $roomRepository
+     * @param UserRepository $userRepository
+     * @return jsonArray[]
+     * @Route("/list", name="room_list", methods={"GET"})
+     */
+    public function roomList(RoomRepository $roomRepository, UserRepository $userRepository)
+    {
+        $responseArray = $roomRepository->transformAll($userRepository);
+
+        return new JsonResponse($responseArray);
+    }
+    
     /**
      * Create room
      * Only user who has ROLE_GUIDE as role can access.
