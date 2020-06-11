@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class AudioControllerTest extends WebTestCase
 {
 	private $username = 'guide@guide.com';					// Only the user who has ROLE_GUIDE
-	private $password = 'test';
+	private $password = '123456';
 
 	/**
 	 * Audio create unit test

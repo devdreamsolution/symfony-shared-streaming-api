@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class RoomControllerTest extends WebTestCase
 {
     private $username = 'guide@guide.com';					// Only the user who has ROLE_GUIDE
-    private $password = 'test';
+    private $password = '123456';
 
     /**
      * Room create unit test

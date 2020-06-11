@@ -25,7 +25,7 @@ class AppFixtures extends Fixture
             ['ROLE_GUIDE'],
         );
 
-        $user->setPassword($this->encoder->encodePassword($user, 'test'));
+        $user->setPassword($this->encoder->encodePassword($user, '123456'));
 
         $manager->persist($user);
         $manager->flush();

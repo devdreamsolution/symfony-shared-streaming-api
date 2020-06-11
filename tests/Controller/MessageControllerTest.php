@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class MessageControllerTest extends WebTestCase
 {
     private $username = 'guide@guide.com';
-    private $password = 'test';
+    private $password = '123456';
 
     /**
      * Message create unit test
