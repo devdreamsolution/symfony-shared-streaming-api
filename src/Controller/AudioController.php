@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Audio;
 use App\Repository\AudioRepository;
 use App\Repository\RoomRepository;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,11 +18,27 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class AudioController extends AbstractController
 {
     /**
+     * List audio
+     * @param int $room_id
+     * @param AudioRepository $audioRepository
+     * @param RoomRepository $roomRepository
+     * @param UserRepository $userRepository
+     * @return jsonArray[]
+     * @Route("/{room_id}/list", name="audio_list", methods={"GET"})
+     */
+    public function audioList(int $room_id, AudioRepository $audioRepository, RoomRepository $roomRepository, UserRepository $userRepository)
+    {
+        $responseArray = $audioRepository->transformByRoom($room_id, $roomRepository, $userRepository);
+
+        return new JsonResponse($responseArray);
+    }
+
+    /**
      * Create audio
      * Only user who has ROLE_GUIDE as roles can access.
-     * @param Request
-     * @param RoomRepository
-     * @param ValidatorInterface
+     * @param Request $request
+     * @param RoomRepository $roomRepository
+     * @param ValidatorInterface $validator
      * @return jsonArray[]
      * @Route("/create", name="audio_create", methods={"POST"})
      */
@@ -69,7 +86,7 @@ class AudioController extends AbstractController
      * @param ValidatorInderface $validator
      * @Route("/{audio_id}/edit", name="audio_edit", methods={"POST"})
      */
-    public function audioEdit($audio_id, Request $request, AudioRepository $audioRepository, ValidatorInterface $validator)
+    public function audioEdit(int $audio_id, Request $request, AudioRepository $audioRepository, ValidatorInterface $validator)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -108,7 +125,7 @@ class AudioController extends AbstractController
      * Delete audio
      * Only user who is recorder of this audio can delete.
      * @param int $audio_id
-     * @param AudioRepository
+     * @param AudioRepository $audioRepository
      * @return jsonArray[]
      * @Route("/{audio_id}/delete", name="audio_delete", methods={"DELETE"})
      */
