@@ -1,6 +1,5 @@
 <?php
 
-// src/App/EventListener/AuthenticationSuccessListener.php
 namespace App\EventListener;
 
 /**
@@ -23,7 +22,7 @@ class AuthenticationSuccessListener
 
         $data['userdata'] = array(
             'username' => $user->getUsername(),
-            'roles' => $user->getRoles()
+            'roles' => $user->getRoles(),
         );
 
         $event->setData($data);
