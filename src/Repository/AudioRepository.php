@@ -16,24 +16,30 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class AudioRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $roomRepository;
+    private $userRepository;
+    private $baseURL;
+
+    public function __construct(RoomRepository $roomRepository, UserRepository $userRepository, ManagerRegistry $registry)
     {
+        $this->roomRepository = $roomRepository;
+        $this->userRepository = $userRepository;
+        $this->baseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+
         parent::__construct($registry, Audio::class);
     }
 
     /**
      * Transform of all audio
-     * @param RoomRepository $roomRepository
-     * @param UserRepository $userRepository
      * @return Array[]
      */
-    public function transformAll(RoomRepository $roomRepository, UserRepository $userRepository)
+    public function transformAll()
     {
         $audios = $this->findAll();
         $audioArray = [];
 
         foreach ($audios as $audio) {
-            $audioArray[] = $this->transform($audio, $roomRepository, $userRepository);
+            $audioArray[] = $this->transform($audio);
         }
 
         return $audioArray;
@@ -42,17 +48,15 @@ class AudioRepository extends ServiceEntityRepository
     /**
      * Transform by room id
      * @param int $room_id
-     * @param RoomRepository $roomRepository
-     * @param UserRepository $userRepository
      * @return Array[]
      */
-    public function transformByRoom(int $room_id, RoomRepository $roomRepository, UserRepository $userRepository)
+    public function transformByRoom(int $room_id)
     {
         $audios = $this->findByRoom($room_id);
         $audioArray = [];
 
         foreach ($audios as $audio) {
-            $audioArray[] = $this->transform($audio, $roomRepository, $userRepository);
+            $audioArray[] = $this->transform($audio);
         }
 
         return $audioArray;
@@ -61,16 +65,15 @@ class AudioRepository extends ServiceEntityRepository
     /**
      * Transform of audio
      * @param Audio $audio
-     * @param UserRepository $userRepository
      * @return Array[]
      */
-    public function transform(Audio $audio, RoomRepository $roomRepository, UserRepository $userRepository)
+    public function transform(Audio $audio)
     {
         return [
             'id' => $audio->getId(),
-            'room' => $roomRepository->transform($audio->getRoom(), $userRepository),
-            'recorder' => $userRepository->transform($audio->getRecorder()),
-            'audio' => $audio->getAudio(),
+            'room' => $this->roomRepository->transform($audio->getRoom()),
+            'recorder' => $this->userRepository->transform($audio->getRecorder()),
+            'audio' => $this->baseURL . '/' . $audio->getAudio(),
             'created_at' => $audio->getCreatedAt(),
             'updated_at' => $audio->getUpdatedAt(),
         ];

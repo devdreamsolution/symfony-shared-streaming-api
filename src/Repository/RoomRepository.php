@@ -15,8 +15,13 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RoomRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $userRepository;
+    private $baseURL;
+
+    public function __construct(UserRepository $userRepository, ManagerRegistry $registry)
     {
+        $this->userRepository = $userRepository;
+        $this->baseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
         parent::__construct($registry, Room::class);
     }
 
@@ -25,13 +30,13 @@ class RoomRepository extends ServiceEntityRepository
      * @param UserRepository $userRepository
      * @return Array[]
      */
-    public function transformAll(UserRepository $userRepository)
+    public function transformAll()
     {
         $rooms = $this->findAll();
         $roomsArray = [];
 
         foreach ($rooms as $room) {
-            $roomsArray[] = $this->transform($room, $userRepository);
+            $roomsArray[] = $this->transform($room);
         }
 
         return $roomsArray;
@@ -40,17 +45,16 @@ class RoomRepository extends ServiceEntityRepository
     /**
      * Transform of room
      * @param Room $room
-     * @param UserRepository $userRepository
      * @return Array[]
      */
-    public function transform(Room $room, UserRepository $userRepository)
+    public function transform(Room $room)
     {
         return [
             'id' => $room->getId(),
-            'owner' => $userRepository->transform($room->getOwner()),
+            'owner' => $this->userRepository->transform($room->getOwner()),
             'name' => $room->getName(),
             'description' => $room->getDescription(),
-            'qr_url' => $room->getQrUrl(),
+            'qr_url' => $this->baseURL . '/' . $room->getQrUrl(),
             'start_time' => $room->getStartTime(),
             'created_at' => $room->getCreatedAt(),
             'updated_at' => $room->getUpdatedAt(),
