@@ -47,7 +47,7 @@ class Room
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $qr_url;
+    private $qr_code;
 
     /**
      * @ORM\Column(type="datetime")
@@ -74,14 +74,14 @@ class Room
      */
     private $messages;
 
-    public function __construct(User $owner, string $name, string $description, string $qr_url, DateTime $start_time)
+    public function __construct(User $owner, string $name, string $description, string $qr_code, DateTime $start_time)
     {
         $this->user = new ArrayCollection();
 
         $this->owner = $owner;
         $this->name = $name;
         $this->description = $description;
-        $this->qr_url = $qr_url;
+        $this->qr_code = $qr_code;
         $this->start_time = $start_time;
         $this->adduser($owner);
 
@@ -156,14 +156,14 @@ class Room
         return $this;
     }
 
-    public function getQrUrl(): ?string
+    public function getQrCode(): ?string
     {
-        return $this->qr_url;
+        return $this->qr_code;
     }
 
-    public function setQrUrl(string $qr_url): self
+    public function setQrCode(string $qr_code): self
     {
-        $this->qr_url = $qr_url;
+        $this->qr_code = $qr_code;
 
         return $this;
     }
