@@ -54,11 +54,44 @@ class RoomRepository extends ServiceEntityRepository
             'owner' => $this->userRepository->transform($room->getOwner()),
             'name' => $room->getName(),
             'description' => $room->getDescription(),
-            'qr_url' => $this->baseURL . '/' . $room->getQrUrl(),
+            'qr_code' => $this->baseURL . '/' . $room->getQrCode(),
             'start_time' => $room->getStartTime(),
             'created_at' => $room->getCreatedAt(),
             'updated_at' => $room->getUpdatedAt(),
         ];
+    }
+
+    /**
+     * Transform by QR code
+     * @param String $qr_code
+     * @return Array[]
+     */
+    public function transformByQrCode(String $qr_code)
+    {
+        $room = $this->findOneByQrCode($qr_code);
+        if ($room) {
+            $result = $this->transform($room);
+        } else {
+            $result['code'] = 400;
+            $result['message'] = 'The room is not existed.';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Find one by QR code
+     * @param String $qr_code
+     * @return Room
+     */
+    public function findOneByQrCode(String $qr_code): ?Room
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.qr_code = :qr_code')
+            ->setParameter('qr_code', $qr_code)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 
     // /**
@@ -74,18 +107,6 @@ class RoomRepository extends ServiceEntityRepository
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Room
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
         ;
     }
     */

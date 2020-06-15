@@ -31,6 +31,20 @@ class RoomController extends AbstractController
     }
     
     /**
+     * Get room by QR code
+     * @param String $qr_code
+     * @param RoomRepository $roomRepository
+     * @return jsonArray[]
+     * @Route("/view/{qr_code}", name="room_view", methods={"GET"})
+     */
+    public function getRoombyQrCode(String $qr_code, RoomRepository $roomRepository)
+    {
+        $responseArray = $roomRepository->transformByQrCode($qr_code);
+
+        return new JsonResponse($responseArray);
+    }
+
+    /**
      * Create room
      * Only user who has ROLE_GUIDE as role can access.
      * @param Request
@@ -83,7 +97,7 @@ class RoomController extends AbstractController
      * @param ValidatorInterface $validator
      * @Route("/{room_id}/edit", name="room_edit", methods={"POST"})
      */
-    public function reoomEdit($room_id, Request $request, RoomRepository $roomRepository, ValidatorInterface $validator)
+    public function reoomEdit(int $room_id, Request $request, RoomRepository $roomRepository, ValidatorInterface $validator)
     {
         $em = $this->getDoctrine()->getManager();
 
