@@ -1,7 +1,6 @@
-gesdinet_jwt_refresh_token:
+token_refresh:
     path:       /api/token/refresh
     controller: gesdinet.jwtrefreshtoken::refresh
-
 
 user_register:
     path: /api/user/register
