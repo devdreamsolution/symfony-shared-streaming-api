@@ -96,6 +96,9 @@
     "exsyst/swagger": {
         "version": "v0.4.1"
     },
+    "gesdinet/jwt-refresh-token-bundle": {
+        "version": "v0.9.1"
+    },
     "lcobucci/jwt": {
         "version": "3.3.2"
     },
