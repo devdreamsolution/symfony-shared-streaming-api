@@ -21,14 +21,26 @@ class AudioController extends AbstractController
      * List audio
      * @param int $room_id
      * @param AudioRepository $audioRepository
-     * @param RoomRepository $roomRepository
-     * @param UserRepository $userRepository
      * @return jsonArray[]
      * @Route("/{room_id}/list", name="audio_list", methods={"GET"})
      */
-    public function audioList(int $room_id, AudioRepository $audioRepository, RoomRepository $roomRepository, UserRepository $userRepository)
+    public function audioList(int $room_id, AudioRepository $audioRepository)
     {
-        $responseArray = $audioRepository->transformByRoom($room_id, $roomRepository, $userRepository);
+        $responseArray = $audioRepository->transformByRoom($room_id);
+
+        return new JsonResponse($responseArray);
+    }
+
+    /**
+     * Get audio
+     * @param int $audio_id
+     * @param AudioRepository $audioRepository
+     * @return jsonArray[]
+     * @Route("/{audio_id}/view", name="audio_view", methods={"GET"})
+     */
+    public function audioView(int $audio_id, AudioRepository $audioRepository)
+    {
+        $responseArray = $audioRepository->transformOne($audio_id);
 
         return new JsonResponse($responseArray);
     }
