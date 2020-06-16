@@ -46,6 +46,19 @@ class AudioRepository extends ServiceEntityRepository
     }
 
     /**
+     * Transform one
+     * @param int $audio_id
+     * @return Array[]
+     */
+    public function transformOne($audio_id)
+    {
+        $audio = $this->find($audio_id);
+        $audioArray[] = $this->transform($audio);
+        
+        return $audioArray;
+    }
+
+    /**
      * Transform by room id
      * @param int $room_id
      * @return Array[]

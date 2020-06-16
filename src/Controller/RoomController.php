@@ -37,7 +37,7 @@ class RoomController extends AbstractController
      * @return jsonArray[]
      * @Route("/view/{qr_code}", name="room_view", methods={"GET"})
      */
-    public function getRoombyQrCode(String $qr_code, RoomRepository $roomRepository)
+    public function roomViewByQrCode(String $qr_code, RoomRepository $roomRepository)
     {
         $responseArray = $roomRepository->transformByQrCode($qr_code);
 
