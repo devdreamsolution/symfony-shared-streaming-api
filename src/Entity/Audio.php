@@ -6,6 +6,7 @@ use App\Repository\AudioRepository;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @ORM\Entity(repositoryClass=AudioRepository::class)
@@ -92,11 +93,14 @@ class Audio
 
     public function setAudio(File $audio): self
     {
-        $this->audio = $audio;
         if ($audio) {
             $uploadDir = 'uploads\audios';
             $fileName = md5(uniqid()) . '.' . $audio->guessExtension();
             $path = $audio->move($uploadDir, $fileName);
+
+            // Old file remove
+            $filesystem = new Filesystem();
+            $filesystem->remove($this->audio);
             $this->audio = $path;
         }
 
