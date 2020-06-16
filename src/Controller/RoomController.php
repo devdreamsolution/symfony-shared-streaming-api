@@ -136,8 +136,11 @@ class RoomController extends AbstractController
 
         $em->persist($room);
         $em->flush();
-
-        return new JsonResponse('Successfully');
+        $data = $roomRepository->transform($room);
+        return new JsonResponse([
+            'success' => true,
+            'data' => $data,
+        ]);
     }
 
     /**
