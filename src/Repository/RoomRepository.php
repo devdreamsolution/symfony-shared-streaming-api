@@ -16,12 +16,10 @@ use Doctrine\Persistence\ManagerRegistry;
 class RoomRepository extends ServiceEntityRepository
 {
     private $userRepository;
-    private $baseURL;
 
     public function __construct(UserRepository $userRepository, ManagerRegistry $registry)
     {
         $this->userRepository = $userRepository;
-        $this->baseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
         parent::__construct($registry, Room::class);
     }
 
@@ -54,7 +52,7 @@ class RoomRepository extends ServiceEntityRepository
             'owner' => $this->userRepository->transform($room->getOwner()),
             'name' => $room->getName(),
             'description' => $room->getDescription(),
-            'qr_code' => $this->baseURL . '/' . $room->getQrCode(),
+            'qr_code' => $room->getQrCode(),
             'start_time' => $room->getStartTime(),
             'created_at' => $room->getCreatedAt(),
             'updated_at' => $room->getUpdatedAt(),

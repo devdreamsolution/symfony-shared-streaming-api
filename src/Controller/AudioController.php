@@ -130,7 +130,12 @@ class AudioController extends AbstractController
         $em->persist($audio);
         $em->flush();
 
-        return new JsonResponse('Successfully');
+        $data = $audioRepository->transform($audio);
+
+        return new JsonResponse([
+            'success' => true,
+            'data' => $data
+        ]);
     }
 
     /**
