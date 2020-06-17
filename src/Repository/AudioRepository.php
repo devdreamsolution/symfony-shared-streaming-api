@@ -53,9 +53,17 @@ class AudioRepository extends ServiceEntityRepository
     public function transformOne($audio_id)
     {
         $audio = $this->find($audio_id);
-        $audioArray[] = $this->transform($audio);
+        if ($audio) {
+            $result['success'] = true;
+            $result['message'] = '';
+            $result['data'] = $this->transform($audio);
+        } else {
+            $result['success'] = false;
+            $result['message'] = "Audio record with ID: $audio_id not found.";
+            $result['data'] = null;
+        }
         
-        return $audioArray;
+        return $result;
     }
 
     /**

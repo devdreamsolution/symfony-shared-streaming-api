@@ -68,10 +68,13 @@ class RoomRepository extends ServiceEntityRepository
     {
         $room = $this->findOneByQrCode($qr_code);
         if ($room) {
-            $result = $this->transform($room);
+            $result['success'] = true;
+            $result['message'] = '';
+            $result['data'] = $this->transform($room);
         } else {
-            $result['code'] = 400;
-            $result['message'] = 'The room is not existed.';
+            $result['success'] = false;
+            $result['message'] = "Room record with QR code: $qr_code not found.";
+            $result['data'] = null;
         }
 
         return $result;
