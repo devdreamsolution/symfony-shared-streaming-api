@@ -84,6 +84,34 @@ class AudioRepository extends ServiceEntityRepository
     }
 
     /**
+     * Transform by QR code
+     * @param String $qr_code
+     * @return Array[]
+     */
+    public function transformByQrCode(String $qr_code)
+    {
+        $room = $this->roomRepository->findOneByQrCode($qr_code);
+        if (!$room) {
+            $result['success'] = false;
+            $result['message'] = "Room record with ID: $qr_code not found.";
+            $result['data'] = null;
+            return $result;
+        }
+        $audios = $this->findByRoom($room->getId());
+        $audioArray = [];
+        
+        foreach ($audios as $audio) {
+            $audioArray[] = $this->transform($audio);
+        }
+
+        $result['success'] = true;
+        $result['message'] = '';
+        $result['data'] = $audioArray;
+
+        return $result;
+    }
+
+    /**
      * Transform of audio
      * @param Audio $audio
      * @return Array[]
