@@ -17,8 +17,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    private $baseURL;
+
     public function __construct(ManagerRegistry $registry)
     {
+        $this->baseURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+
         parent::__construct($registry, User::class);
     }
 
@@ -65,6 +69,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             'roles' => $user->getRoles(),
             'name' => $user->getName(),
             'surename' => $user->getSurename(),
+            'picture' => $this->baseURL . '/' . $user->getPicture(),
+            'age' => $user->getAge(),
+            'vat' => $user->getVat(),
+            'address' => $user->getAddress(),
+            'city_residence' => $user->getCityResidence(),
+            'group_age' => $user->getGroupAge(),
+            'gender' => $user->getGender(),
+            'lang' => $user->getLang(),
             'created_at' => $user->getCreatedAt(),
             'updated_at' => $user->getUpdatedAt(),
         ];
