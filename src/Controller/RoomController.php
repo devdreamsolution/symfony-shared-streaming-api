@@ -79,13 +79,21 @@ class RoomController extends AbstractController
                 $responseArray['code'] = $error->getCode();
                 $responseArray[$key] = $error->getMessage();
             }
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Form validate error',
+                'data' => $responseArray
+            ]);
         }
 
         $em->persist($room);
         $em->flush();
 
-        return new JsonResponse('Successfully');
+        return new JsonResponse([
+            'success' => true,
+            'message' => '',
+            'data' => null
+        ]);
     }
 
     /**
@@ -103,9 +111,11 @@ class RoomController extends AbstractController
 
         $room = $roomRepository->find($room_id);
         if (!$room) {
-            $responseArray['code'] = 400;
-            $responseArray['message'] = 'The room is not existed.';
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => "Room record with ID: $room_id not found.",
+                'data' => null
+            ]);
         }
         $this->denyAccessUnlessGranted('EDIT', $room);
 
@@ -131,14 +141,20 @@ class RoomController extends AbstractController
                 $responseArray['code'] = $error->getCode();
                 $responseArray[$key] = $error->getMessage();
             }
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Form validate error',
+                'data' => $responseArray
+            ]);
         }
 
         $em->persist($room);
         $em->flush();
         $data = $roomRepository->transform($room);
+
         return new JsonResponse([
             'success' => true,
+            'message' => '',
             'data' => $data,
         ]);
     }
@@ -157,9 +173,11 @@ class RoomController extends AbstractController
 
         $room = $roomRepository->find($room_id);
         if (!$room) {
-            $responseArray['code'] = 400;
-            $responseArray['message'] = 'The room is already not existed.';
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => "Room record with ID: $room_id not found.",
+                'data' => null
+            ]);
         }
         
         $this->denyAccessUnlessGranted('DELETE', $room);
@@ -167,6 +185,10 @@ class RoomController extends AbstractController
         $em->remove($room);
         $em->flush();
 
-        return new JsonResponse('Successfully');
+        return new JsonResponse([
+            'success' => true,
+            'message' => '',
+            'data' => null
+        ]);
     }
 }

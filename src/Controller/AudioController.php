@@ -63,9 +63,11 @@ class AudioController extends AbstractController
 
         $room = $roomRepository->find($room_id);
         if (!$room) {
-            $responseArray['code'] = 400;
-            $responseArray['message'] = 'The room is not existed.';
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => "Audio record with ID: $room_id not found.",
+                'data' => null
+            ]);
         }
         $recorder = $this->getUser();
         
@@ -80,13 +82,21 @@ class AudioController extends AbstractController
                 $responseArray['code'] = $error->getCode();
                 $responseArray[$key] = $error->getMessage();
             }
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Form validate error',
+                'data' => $responseArray
+            ]);
         }
 
         $em->persist($audio);
         $em->flush();
 
-        return new JsonResponse('Succesfully');
+        return new JsonResponse([
+            'success' => true,
+            'message' => '',
+            'data' => null
+        ]);
     }
 
     /**
@@ -104,9 +114,11 @@ class AudioController extends AbstractController
 
         $audio = $audioRepository->find($audio_id);
         if (!$audio) {
-            $responseArray['code'] = 400;
-            $responseArray['message'] = 'The audio is not existed';
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => "Audio record with ID: $audio_id not found.",
+                'data' => null
+            ]);
         }
         
         $this->denyAccessUnlessGranted('EDIT', $audio);
@@ -124,7 +136,11 @@ class AudioController extends AbstractController
                 $responseArray['code'] = $error->getCode();
                 $responseArray[$key] = $error->getMessage();
             }
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Form validate error',
+                'data' => $responseArray
+            ]);
         }
 
         $em->persist($audio);
@@ -134,6 +150,7 @@ class AudioController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
+            'message' => '',
             'data' => $data
         ]);
     }
@@ -152,9 +169,11 @@ class AudioController extends AbstractController
 
         $audio = $audioRepository->find($audio_id);
         if (!$audio) {
-            $responseArray['code'] = 400;
-            $responseArray['message'] = 'The audio is already not existed';
-            return new JsonResponse($responseArray);
+            return new JsonResponse([
+                'success' => false,
+                'message' => "Audio record with ID: $audio_id not found.",
+                'data' => null
+            ]);
         }
 
         $this->denyAccessUnlessGranted('DELETE', $audio);
@@ -162,6 +181,10 @@ class AudioController extends AbstractController
         $em->remove($audio);
         $em->flush();
 
-        return new JsonResponse('Successfully');
+        return new JsonResponse([
+            'success' => true,
+            'message' => '',
+            'data' => null
+        ]);
     }
 }
