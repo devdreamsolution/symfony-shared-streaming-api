@@ -18,15 +18,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class AudioController extends AbstractController
 {
     /**
-     * List audio
-     * @param int $room_id
+     * List audio by QR code
+     * @param String $qr_code
      * @param AudioRepository $audioRepository
      * @return jsonArray[]
-     * @Route("/{room_id}/list", name="audio_list", methods={"GET"})
+     * @Route("/list/{qr_code}", name="audio_list", methods={"GET"})
      */
-    public function audioList(int $room_id, AudioRepository $audioRepository)
+    public function audioListByQrCode(String $qr_code, AudioRepository $audioRepository)
     {
-        $responseArray = $audioRepository->transformByRoom($room_id);
+        $responseArray = $audioRepository->transformByQrCode($qr_code);
 
         return new JsonResponse($responseArray);
     }
