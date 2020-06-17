@@ -265,12 +265,7 @@ class User implements UserInterface
 
     public function setPicture(?File $picture = null): self
     {
-        if ($picture) {
-            $uploadDir = 'uploads\pictures';
-            $fileName = md5(uniqid()) . '.' . $picture->guessExtension();
-            $path = $picture->move($uploadDir, $fileName);
-            $this->picture = $path;
-        }
+        $this->picture = $picture;
 
         return $this;
     }
@@ -380,6 +375,8 @@ class User implements UserInterface
             $fileName = md5(uniqid()) . '.' . $this->picture->guessExtension();
             $path = $this->picture->move($uploadDir, $fileName);
             $this->picture = $path;
+        } else {
+            $this->picture = 'assets\images\default-avatar.jpg';
         }
 
         // created at
@@ -398,6 +395,8 @@ class User implements UserInterface
             $fileName = md5(uniqid()) . '.' . $this->picture->guessExtension();
             $path = $this->picture->move($uploadDir, $fileName);
             $this->picture = $path;
+        } else {
+            $this->picture = 'assets\images\default-avatar.jpg';
         }
 
         // updated at
