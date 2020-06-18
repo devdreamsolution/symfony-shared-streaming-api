@@ -71,16 +71,24 @@ class AudioRepository extends ServiceEntityRepository
      * @param int $room_id
      * @return Array[]
      */
-    public function transformByRoom(int $room_id)
+    public function transformByRoomId(int $room_id)
     {
         $audios = $this->findByRoom($room_id);
+        if (!$audios) {
+            $result['success'] = false;
+            $result['message'] = "Room record with ID: $room_id not found.";
+            $result['data'] = null;
+        }
         $audioArray = [];
 
         foreach ($audios as $audio) {
             $audioArray[] = $this->transform($audio);
         }
+        $result['success'] = true;
+        $result['message'] = '';
+        $result['data'] = $audioArray;
 
-        return $audioArray;
+        return $result;
     }
 
     /**
@@ -93,7 +101,7 @@ class AudioRepository extends ServiceEntityRepository
         $room = $this->roomRepository->findOneByQrCode($qr_code);
         if (!$room) {
             $result['success'] = false;
-            $result['message'] = "Room record with ID: $qr_code not found.";
+            $result['message'] = "Room record with QR code: $qr_code not found.";
             $result['data'] = null;
             return $result;
         }
@@ -106,7 +114,8 @@ class AudioRepository extends ServiceEntityRepository
 
         $result['success'] = true;
         $result['message'] = '';
-        $result['data'] = $audioArray;
+        $result['data']['current_room'] = $this->roomRepository->transform($room);
+        $result['data']['audios'] = $audioArray;
 
         return $result;
     }
