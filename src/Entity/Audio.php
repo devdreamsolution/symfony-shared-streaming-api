@@ -35,7 +35,7 @@ class Audio
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\File(mimeTypes = {"audio/x-wav", "audio/wmv"})
+     * @Assert\File(mimeTypes = {"audio/mpeg", "audio/x-wav", "audio/wmv"})
      * @Assert\NotBlank()
      */
     private $audio;

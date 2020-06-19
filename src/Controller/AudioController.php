@@ -62,17 +62,18 @@ class AudioController extends AbstractController
     /**
      * Create audio
      * Only user who has ROLE_GUIDE as roles can access.
+     * @param int $room_id
      * @param Request $request
      * @param RoomRepository $roomRepository
      * @param ValidatorInterface $validator
      * @return jsonArray[]
-     * @Route("/create", name="audio_create", methods={"POST"})
+     * @Route("/{room_id}/create", name="audio_create", methods={"POST"})
      */
-    public function audioCreate(Request $request, RoomRepository $roomRepository, ValidatorInterface $validator)
+    public function audioCreate(int $room_id, Request $request, RoomRepository $roomRepository, ValidatorInterface $validator)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $room_id = $request->request->get('room_id');
+        // $room_id = $request->request->get('room_id');
         $file = $request->files->get('audio');
 
         $room = $roomRepository->find($room_id);
