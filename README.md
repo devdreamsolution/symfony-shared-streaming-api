@@ -1,4 +1,5 @@
 # Symfony shared audio streaming
+Audio record, broadcast live streaming API endpint using Symfony 5.0.8
 
 
 ## Get started
@@ -19,4 +20,11 @@ $ php bin/console doctrine:fixtures:load
 Run the web server:
 ```sh
 $ php bin/console server:run
+```
+
+## Test
+
+PHP unit test:
+```sh
+$ php bin/phpunit
 ```
