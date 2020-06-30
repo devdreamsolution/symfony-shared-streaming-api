@@ -371,7 +371,7 @@ class User implements UserInterface
     {
         // picture upload
         if ($this->picture) {
-            $uploadDir = 'uploads\pictures';
+            $uploadDir = 'uploads/pictures';
             $fileName = md5(uniqid()) . '.' . $this->picture->guessExtension();
             $path = $this->picture->move($uploadDir, $fileName);
             $this->picture = $path;
@@ -391,7 +391,7 @@ class User implements UserInterface
     {
         // picture upload
         if ($this->picture) {
-            $uploadDir = 'uploads\pictures';
+            $uploadDir = 'uploads/pictures';
             $fileName = md5(uniqid()) . '.' . $this->picture->guessExtension();
             $path = $this->picture->move($uploadDir, $fileName);
             $this->picture = $path;

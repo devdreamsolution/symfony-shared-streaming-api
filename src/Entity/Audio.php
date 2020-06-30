@@ -94,7 +94,7 @@ class Audio
     public function setAudio(File $audio): self
     {
         if ($audio) {
-            $uploadDir = 'uploads\audios';
+            $uploadDir = 'uploads/audios';
             $fileName = md5(uniqid()) . '.' . $audio->guessExtension();
             $path = $audio->move($uploadDir, $fileName);
 
@@ -124,7 +124,7 @@ class Audio
     {
         // audio upload
         if ($this->audio) {
-            $uploadDir = 'uploads\audios';
+            $uploadDir = 'uploads/audios';
             $fileName = md5(uniqid()) . '.' . $this->audio->guessExtension();
             $path = $this->audio->move($uploadDir, $fileName);
             $this->audio = $path;
