@@ -27,6 +27,7 @@
     "symfony/css-selector": "5.0.*",
     "symfony/maker-bundle": "^1.18",
     "symfony/phpunit-bridge": "^5.0",
+    "symfony/profiler-pack": "^1.0",
     "symfony/web-server-bundle": "4.4.*"
   },
   "config": {
