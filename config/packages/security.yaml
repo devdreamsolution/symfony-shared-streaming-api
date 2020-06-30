@@ -10,6 +10,21 @@ security:
                 property: email
 
     firewalls:
+        audio_list:
+            pattern: ^/api/audio/list
+            stateless: true
+            anonymous: true
+            
+        room_list:
+            pattern: ^/api/room/list
+            stateless: true
+            anonymous: true
+
+        room_view:
+            pattern: ^/api/room/view
+            stateless: true
+            anonymous: true
+
         refresh:
             pattern:  ^/api/token/refresh
             stateless: true
@@ -49,8 +64,10 @@ security:
         
 
     access_control:
+        - { path: ^/api/audio/list, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/room/view, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/room/list, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/token/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/user/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
-        
