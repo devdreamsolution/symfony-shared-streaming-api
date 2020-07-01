@@ -1,5 +1,5 @@
 # Symfony shared audio streaming
-Audio record, broadcast live streaming API endpint using Symfony 5.0.8
+Audio record, broadcast live streaming RESTful API endpint using Symfony 5.0.8
 
 
 ## Get started
